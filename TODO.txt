@@ -1,0 +1,7 @@
+For PS
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+go-readability "https://example.com" | Out-File -FilePath artykul.html -Encoding utf8
+
+for cmd
+chcp 65001
+go-readability "https://ounapuu.ee/posts/2026/04/01/focus/?utm_source=unknownews" > artykul.html
