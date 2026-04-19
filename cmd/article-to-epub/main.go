@@ -1,37 +1,21 @@
 package main
 
 import (
-	kernel "github.com/Marekt94/go-kernel-mt"
-	l "github.com/Marekt94/go-kernel-mt/logging"
+	"article-to-epub/pkg/modules/articlesimplifier"
+	"log"
+
+	_ "github.com/Marekt94/go-kernel-mt"
 )
 
-type ArticleToEpubKernel struct {
-	kernel.Kernel
-}
-
-func (k *ArticleToEpubKernel) Init() {
-
-}
-
-func (k *ArticleToEpubKernel) RegisterModule(m kernel.ModuleIntf) {
-
-}
-
-func (k *ArticleToEpubKernel) Run() {
-
-}
-
-func (k *ArticleToEpubKernel) NewAtEKernel() kernel.KernelIntf {
-	l.SetGlobalLogger(l.NewZerologLogger())
-	l.Global.Infof("Logger initialized")
-	l.Global.Infof("Creating new ArticleToEpubKernel instance")
-	ke := ArticleToEpubKernel{Kernel: kernel.NewKernel()}
-	l.Global.Infof("ArticleToEpubKernel instance created")
-	return &ke
-}
-
 func main() {
-	k := ArticleToEpubKernel{}
-	k.Init()
-	k.Run()
+	simplifier := &articlesimplifier.ArticleSimplifier{}
+	out, err := simplifier.SimplifyArticle([]byte("https://fs.blog/mental-models/?utm_source=unknownews"), 30)
+	if err != nil {
+		log.Fatalf("Error simplifying article: %v", err)
+	}
+	htmlToEpub := articlesimplifier.HtmlToEpubConverter{}
+	_, err = htmlToEpub.ConvertHtmlToEpub(out)
+	if err != nil {
+		log.Fatalf("Error converting HTML to EPUB: %v", err)
+	}
 }
