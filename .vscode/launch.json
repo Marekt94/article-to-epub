@@ -1,0 +1,20 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug article-to-epub",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/article-to-epub",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "ARTICLE_SIMPLIFIER_TIMEOUT": "30",
+        "EBOOK_CONVERTER_PATH": "C:/Program Files/Calibre2/ebook-converter.exe"
+      },
+      "args": [],
+      "showLog": false
+    }
+  ]
+}
