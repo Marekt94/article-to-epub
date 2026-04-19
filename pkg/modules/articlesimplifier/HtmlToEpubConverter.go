@@ -3,24 +3,27 @@ package articlesimplifier
 import (
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 const tempHtmlDir = ".\\temp"
-const tempHtmlPath = tempHtmlDir + "\\temp.html"
-const outputEpubPath = tempHtmlDir + "\\temp.epub"
+const tempHtmlFileName = "temp.html"
+const outputEpubFileName = "temp.epub"
 
 type HtmlToEpubConverter struct {
 }
 
-func (c *HtmlToEpubConverter) ConvertHtmlToEpub(html []byte) ([]byte, error) {
-	if err := os.Mkdir(tempHtmlDir, 0755); err != nil && !os.IsExist(err) {
+func (c *HtmlToEpubConverter) HtmlToEpubConverterInternal(html []byte, outputDir string, outputFileName string) ([]byte, error) {
+	if err := os.Mkdir(outputDir, 0755); err != nil && !os.IsExist(err) {
 		return nil, err
 	}
-	if err := os.WriteFile(tempHtmlPath, html, 0644); err != nil {
+	filePathInt := filepath.Join(outputDir, tempHtmlFileName)
+	if err := os.WriteFile(filePathInt, html, 0644); err != nil {
 		return nil, err
 	}
+	defer os.Remove(filePathInt)
 
-	cmd := exec.Command("ebook-convert.exe", tempHtmlPath, outputEpubPath)
+	cmd := exec.Command("ebook-convert.exe", filePathInt, filepath.Join(outputDir, outputFileName))
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -30,9 +33,16 @@ func (c *HtmlToEpubConverter) ConvertHtmlToEpub(html []byte) ([]byte, error) {
 
 	var out []byte
 	var err error
-	if out, err = os.ReadFile(outputEpubPath); err != nil {
+	filePathInt = filepath.Join(outputDir, outputFileName)
+	if out, err = os.ReadFile(filePathInt); err != nil {
 		return nil, err
 	}
+	defer os.Remove(filePathInt)
 
 	return out, nil
+}
+
+func (c *HtmlToEpubConverter) ConvertHtmlToEpub(html []byte) ([]byte, error) {
+	epub, err := c.HtmlToEpubConverterInternal(html, tempHtmlDir, outputEpubFileName)
+	return epub, err
 }

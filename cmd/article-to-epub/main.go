@@ -1,21 +1,57 @@
 package main
 
 import (
-	"article-to-epub/pkg/modules/articlesimplifier"
+	a "article-to-epub/pkg/modules/articlesimplifier"
+	"fmt"
 	"log"
+	"os"
+	"regexp"
+	"strings"
 
-	_ "github.com/Marekt94/go-kernel-mt"
+	"github.com/joho/godotenv"
 )
 
+const ERROR = `ERROR: %v`
+
 func main() {
-	simplifier := &articlesimplifier.ArticleSimplifier{}
-	out, err := simplifier.SimplifyArticle([]byte("https://fs.blog/mental-models/?utm_source=unknownews"), 30)
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error simplifying article: %v", err)
+		log.Printf(ERROR, "Error loading .env file")
 	}
-	htmlToEpub := articlesimplifier.HtmlToEpubConverter{}
-	_, err = htmlToEpub.ConvertHtmlToEpub(out)
-	if err != nil {
-		log.Fatalf("Error converting HTML to EPUB: %v", err)
+
+	var artSimp a.ArticleSimplifierIntf
+	var htmlToEpubController a.HtmlToEpubConverterIntf
+
+	artSimp = &a.ArticleSimplifier{}
+	htmlToEpubController = &a.HtmlToEpubConverter{}
+
+	re := regexp.MustCompile(`[^\pL]+`)
+	for {
+		fmt.Println("Enter article address:")
+		var url string
+		fmt.Scanln(&url)
+
+		html, err := artSimp.SimplifyArticle([]byte(url))
+		if err != nil {
+			log.Printf(ERROR, err)
+			continue
+		}
+
+		out, err := htmlToEpubController.ConvertHtmlToEpub(html)
+		if err != nil {
+			log.Printf(ERROR, err)
+			continue
+		}
+
+		url = strings.ReplaceAll(url, `\`, "")
+		url = re.ReplaceAllString(url, "_")
+		filePath := url + `.epub`
+		err = os.WriteFile(filePath, out, 0644)
+		if err != nil {
+			log.Printf(ERROR, err)
+			continue
+		}
+
+		log.Printf("File saved to: %s", filePath)
 	}
 }

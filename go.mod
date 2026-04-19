@@ -5,6 +5,7 @@ go 1.24.3
 require (
 	github.com/Marekt94/go-kernel-mt v0.2.0
 	github.com/go-shiori/go-readability v0.0.0-20251205110129-5db1dc9836f0
+	github.com/joho/godotenv v1.5.1
 )
 
 require (
@@ -19,5 +20,3 @@ require (
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
 )
-
-replace "github.com/Marekt94/go-kernel-mt" => "../go-kernel-mt"
