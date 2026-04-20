@@ -31,20 +31,20 @@ func main() {
 		var url string
 		fmt.Scanln(&url)
 
-		html, err := artSimp.SimplifyArticle([]byte(url))
+		html, title, authors, err := artSimp.SimplifyArticle([]byte(url))
 		if err != nil {
 			log.Printf(ERROR, err)
 			continue
 		}
 
-		out, err := htmlToEpubController.ConvertHtmlToEpub(html)
+		out, err := htmlToEpubController.ConvertHtmlToEpub(html, title, authors)
 		if err != nil {
 			log.Printf(ERROR, err)
 			continue
 		}
 
-		url = strings.ReplaceAll(url, `\`, "")
-		url = re.ReplaceAllString(url, "_")
+		url = strings.ReplaceAll(title, `\`, "")
+		url = re.ReplaceAllString(title, "_")
 		filePath := url + `.epub`
 		err = os.WriteFile(filePath, out, 0644)
 		if err != nil {

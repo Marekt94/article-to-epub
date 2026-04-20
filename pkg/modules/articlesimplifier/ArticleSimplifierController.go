@@ -14,9 +14,8 @@ const defaultTimeout = 30
 type ArticleSimplifier struct {
 }
 
-func (a *ArticleSimplifier) SimplifyArticle(article []byte) ([]byte, error) {
+func (a *ArticleSimplifier) SimplifyArticle(article []byte) (simpArticle []byte, title string, authors string, err error) {
 	var timeout int
-	var err error
 
 	timeoutStr := os.Getenv("ARTICLE_SIMPLIFIER_TIMEOUT")
 
@@ -27,18 +26,18 @@ func (a *ArticleSimplifier) SimplifyArticle(article []byte) ([]byte, error) {
 		timeout = defaultTimeout
 	}
 
-	out, err := a.SimplifyArticleInt(article, timeout)
-	return out, err
+	out, title, authors, err := a.SimplifyArticleInt(article, timeout)
+	return out, title, authors, err
 }
 
-func (a *ArticleSimplifier) SimplifyArticleInt(input []byte, timeout int) ([]byte, error) {
+func (a *ArticleSimplifier) SimplifyArticleInt(input []byte, timeout int) (simpArticle []byte, title string, authors string, err error) {
 	url := string(input)
 	article, err := readability.FromURL(url, time.Duration(timeout)*time.Second)
 	if err != nil {
-		return nil, err
+		return nil, "", "", err
 	}
 	log.Global.Infof("Article title: %s", article.Title)
 	log.Global.Tracef("Article content: %s", article.Content)
 
-	return []byte(article.Content), nil
+	return []byte(article.Content), article.Title, article.Byline, nil
 }

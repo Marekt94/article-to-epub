@@ -4,16 +4,21 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+
+	"github.com/Marekt94/go-kernel-mt/logging"
 )
 
 const tempHtmlDir = ".\\temp"
 const tempHtmlFileName = "temp.html"
 const outputEpubFileName = "temp.epub"
 
+const cmdTitle = "--title"
+const cmdAuthors = "--authors"
+
 type HtmlToEpubConverter struct {
 }
 
-func (c *HtmlToEpubConverter) HtmlToEpubConverterInternal(html []byte, outputDir string, outputFileName string) ([]byte, error) {
+func (c *HtmlToEpubConverter) HtmlToEpubConverterInternal(html []byte, outputDir string, outputFileName string, title string, authors string) ([]byte, error) {
 	if err := os.Mkdir(outputDir, 0755); err != nil && !os.IsExist(err) {
 		return nil, err
 	}
@@ -23,7 +28,9 @@ func (c *HtmlToEpubConverter) HtmlToEpubConverterInternal(html []byte, outputDir
 	}
 	defer os.Remove(filePathInt)
 
-	cmd := exec.Command("ebook-convert.exe", filePathInt, filepath.Join(outputDir, outputFileName))
+	cmd := exec.Command("ebook-convert.exe", filePathInt, filepath.Join(outputDir, outputFileName), cmdTitle, title, cmdAuthors, authors)
+	logging.Global.Debugf(`cmd: %q`, cmd.Args)
+
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
@@ -42,7 +49,7 @@ func (c *HtmlToEpubConverter) HtmlToEpubConverterInternal(html []byte, outputDir
 	return out, nil
 }
 
-func (c *HtmlToEpubConverter) ConvertHtmlToEpub(html []byte) ([]byte, error) {
-	epub, err := c.HtmlToEpubConverterInternal(html, tempHtmlDir, outputEpubFileName)
+func (c *HtmlToEpubConverter) ConvertHtmlToEpub(html []byte, title string, authors string) ([]byte, error) {
+	epub, err := c.HtmlToEpubConverterInternal(html, tempHtmlDir, outputEpubFileName, title, authors)
 	return epub, err
 }
