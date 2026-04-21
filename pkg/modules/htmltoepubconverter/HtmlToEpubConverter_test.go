@@ -1,4 +1,4 @@
-package articlesimplifier
+package htmltoepubconverter
 
 import (
 	"testing"

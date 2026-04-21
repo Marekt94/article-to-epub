@@ -1,7 +1,9 @@
 package main
 
 import (
+	"article-to-epub/pkg/modules"
 	a "article-to-epub/pkg/modules/articlesimplifier"
+	h "article-to-epub/pkg/modules/htmltoepubconverter"
 	"fmt"
 	"log"
 	"os"
@@ -19,11 +21,11 @@ func main() {
 		log.Printf(ERROR, "Error loading .env file")
 	}
 
-	var artSimp a.ArticleSimplifierIntf
-	var htmlToEpubController a.HtmlToEpubConverterIntf
+	var artSimp modules.ArticleSimplifierIntf
+	var htmlToEpubController modules.HtmlToEpubConverterIntf
 
 	artSimp = &a.ArticleSimplifier{}
-	htmlToEpubController = &a.HtmlToEpubConverter{}
+	htmlToEpubController = &h.HtmlToEpubConverter{}
 
 	re := regexp.MustCompile(`[^\pL]+`)
 	for {
