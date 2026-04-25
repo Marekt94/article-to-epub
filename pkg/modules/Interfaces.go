@@ -9,5 +9,5 @@ type HtmlToEpubConverterIntf interface {
 }
 
 type EmailSenderIntf interface {
-	SendEmail(to string, topic string, content string, attachment []byte) error
+	SendEmail(to []string, topic string, content string, attachmentName string, attachment []byte) error
 }

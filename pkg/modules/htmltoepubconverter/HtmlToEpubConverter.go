@@ -28,7 +28,12 @@ func (c *HtmlToEpubConverter) HtmlToEpubConverterInternal(html []byte, outputDir
 	}
 	defer os.Remove(filePathInt)
 
-	cmd := exec.Command("ebook-convert.exe", filePathInt, filepath.Join(outputDir, outputFileName), cmdTitle, title, cmdAuthors, authors)
+	converterExe := os.Getenv("EBOOK_CONVERTER_PATH")
+	if converterExe == "" {
+		converterExe = ".\\ebook-convert.exe"
+	}
+
+	cmd := exec.Command(converterExe, filePathInt, filepath.Join(outputDir, outputFileName), cmdTitle, title, cmdAuthors, authors)
 	logging.Global.Debugf(`cmd: %q`, cmd.Args)
 
 	cmd.Stdout = os.Stdout

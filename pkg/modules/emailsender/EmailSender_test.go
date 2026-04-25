@@ -23,13 +23,14 @@ func TestSendEmail_Integration(t *testing.T) {
 
 	user := os.Getenv("SMTP_USER")
 	pass := os.Getenv("SMTP_PASS")
-	to := `marekt94@gmail.com`
-	if user == "" || pass == "" || to == "" {
-		t.Skip("set SMTP_USER / SMTP_PASS / SMTP_TO (or put them in .env.local) to run this test")
+	to := []string{`marekt94@gmail.com`, `sjndksnkjnakjns@sdkjsndkj.pl`}
+	file := "<html><body><h1>Test</h1></body></html>"
+	if user == "" || pass == "" {
+		t.Skip("set SMTP_USER / SMTP_PASS (or put them in .env.local) to run this test")
 	}
 
-	var emailSender modules.EmailSenderIntf = NewEmailSender(user, pass)
-	err = emailSender.SendEmail(to, "test topic", "test content", nil)
+	var emailSender modules.EmailSenderIntf = NewGmailEmailSender(user, pass)
+	err = emailSender.SendEmail(to, "test topic", "test content", "test.html", []byte(file))
 	if err != nil {
 		t.Fatalf("send failed: %v", err)
 	}

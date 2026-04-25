@@ -5,3 +5,10 @@ go-readability "https://example.com" | Out-File -FilePath artykul.html -Encoding
 for cmd
 chcp 65001
 go-readability "https://ounapuu.ee/posts/2026/04/01/focus/?utm_source=unknownews" > artykul.html
+
+1. Przypilnowac, zeby foldery i pliki byly dobrze konfigurowalne
+2. oprogramowac nazwe pliku i szczegoly na pliku epub na podstawie danych wyczytanych z html (np. nazwa pliku temp przy konwersji na epub poiwnien byc inny)
+3. oprogramowac logowanie (w kontekscie produkcji)
+
+Problemy: czasem apka jest odczytywana jako bot, trzeba zmienic sposob w jaki jest pobierany html, przykladowy url
+https://andiroberts.com/leadership-questions/how-can-i-delegate-better-as-a-leader?utm_source=unknownews
