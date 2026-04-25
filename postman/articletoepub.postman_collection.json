@@ -1,0 +1,102 @@
+{
+  "info": {
+    "_postman_id": "abfcfb19-e3ca-45ed-9114-e9a87bde244d",
+    "name": "articletoepub",
+    "description": "Requests for article-to-epub service (Gin).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "30215534",
+    "_collection_link": "https://go.postman.co/collection/30215534-abfcfb19-e3ca-45ed-9114-e9a87bde244d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Fetch URL -> EPUB (download)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/epub+zip"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"url\": \"https://fs.blog/mental-models/?utm_source=unknownews\",\r\n    \"email\": \"\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/fetch-url",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "fetch-url"
+          ]
+        },
+        "description": "Calls /fetch-url with empty email to return an EPUB file as binary response.\n\nNote: the current server code registers this endpoint as GET but expects JSON body (ShouldBindJSON). Many proxies/clients don’t like GET with body; consider changing server to POST."
+      },
+      "response": []
+    },
+    {
+      "name": "Fetch URL -> EPUB (send email)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"url\": \"https://fs.blog/mental-models/?utm_source=unknownews\",\r\n    \"email\": \"marekt94@gmail.com\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/fetch-url",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "fetch-url"
+          ]
+        },
+        "description": "Calls /fetch-url with email to send EPUB as attachment. Response is JSON (or empty JSON) depending on implementation.\n\nNote: endpoint currently registered as GET but expects JSON body."
+      },
+      "response": []
+    },
+    {
+      "name": "Convert HTML (placeholder)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/convert-html",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "convert-html"
+          ]
+        },
+        "description": "Endpoint exists in router, but handler is currently empty in ModuleArticleToEpub.convertHtml."
+      },
+      "response": []
+    }
+  ]
+}
