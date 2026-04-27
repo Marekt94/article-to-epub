@@ -2,3 +2,4 @@
 .env
 *.epub
 *.exe
+pkg/modules/articlesimplifier/testdata/test_files/
