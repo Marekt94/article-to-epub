@@ -50,7 +50,7 @@ func main() {
 		return
 	}
 
-	artSimp = &a.ArticleSimplifier{}
+	artSimp = &a.ArticleSimplifierFromURL{}
 	htmlToEpubController = &h.HtmlToEpubConverter{}
 	emailSender = emailsender.NewGmailEmailSender(user, pass)
 

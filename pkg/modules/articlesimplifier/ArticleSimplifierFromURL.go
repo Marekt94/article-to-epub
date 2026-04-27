@@ -11,10 +11,10 @@ import (
 
 const defaultTimeout = 30
 
-type ArticleSimplifier struct {
+type ArticleSimplifierFromURL struct {
 }
 
-func (a *ArticleSimplifier) SimplifyArticle(article []byte) (simpArticle []byte, title string, authors string, err error) {
+func (a *ArticleSimplifierFromURL) SimplifyArticle(article []byte) (simpArticle []byte, title string, authors string, err error) {
 	var timeout int
 
 	timeoutStr := os.Getenv("ARTICLE_SIMPLIFIER_TIMEOUT")
@@ -30,7 +30,7 @@ func (a *ArticleSimplifier) SimplifyArticle(article []byte) (simpArticle []byte,
 	return out, title, authors, err
 }
 
-func (a *ArticleSimplifier) SimplifyArticleInt(input []byte, timeout int) (simpArticle []byte, title string, authors string, err error) {
+func (a *ArticleSimplifierFromURL) SimplifyArticleInt(input []byte, timeout int) (simpArticle []byte, title string, authors string, err error) {
 	url := string(input)
 	article, err := readability.FromURL(url, time.Duration(timeout)*time.Second)
 	if err != nil {

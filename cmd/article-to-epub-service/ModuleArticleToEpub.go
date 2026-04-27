@@ -43,7 +43,7 @@ func (m *ModuleArticleToEpub) fetchUrl(c *gin.Context) {
 
 	var a modules.ArticleSimplifierIntf
 
-	a = &articlesimplifier.ArticleSimplifier{}
+	a = &articlesimplifier.ArticleSimplifierFromURL{}
 	html, title, author, err := a.SimplifyArticle([]byte(req.Url))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
