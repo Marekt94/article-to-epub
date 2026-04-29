@@ -81,10 +81,21 @@
       "response": []
     },
     {
-      "name": "Convert HTML (placeholder)",
+      "name": "Convert HTML (download)",
       "request": {
         "method": "POST",
         "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "html",
+              "type": "file",
+              "uuid": "d2fb92eb-a344-46af-85bb-c8807fdc469b",
+              "src": "/C:/Repo/article-to-epub/pkg/modules/articlesimplifier/testdata/test.html"
+            }
+          ]
+        },
         "url": {
           "raw": "{{baseUrl}}/convert-html",
           "host": [
