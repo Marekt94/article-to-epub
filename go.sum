@@ -1,5 +1,7 @@
 github.com/Marekt94/go-kernel-mt v0.2.0 h1:og2fbuZ5z675Qxbu5nkDDymlSDQIpfx9R6ystUJAhUY=
 github.com/Marekt94/go-kernel-mt v0.2.0/go.mod h1:K/vIn5vHLxChKRalK/q0m6THfz5tNBVkeGoKaBEJAkY=
+github.com/alecthomas/kong v1.15.0 h1:BVJstKbpO73zKpmIu+m/aLRrNmWwxXPIGTNin9VmLVI=
+github.com/alecthomas/kong v1.15.0/go.mod h1:wrlbXem1CWqUV5Vbmss5ISYhsVPkBb1Yo7YKJghju2I=
 github.com/andybalholm/cascadia v1.3.3 h1:AG2YHrzJIm4BZ19iwJ/DAua6Btl3IwJX+VI4kktS1LM=
 github.com/andybalholm/cascadia v1.3.3/go.mod h1:xNd9bqTn98Ln4DwST8/nG+H0yuB8Hmgu1YHNnWw0GeA=
 github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de h1:FxWPpzIjnTlhPwqqXc4/vE0f7GvRjuAsbW+HOIe8KnA=

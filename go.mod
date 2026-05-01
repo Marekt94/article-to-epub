@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/alecthomas/kong v1.15.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
