@@ -15,11 +15,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	topic = "Article-to-epub converter: %s"
-	body  = "Article from article-to-epub converter"
-)
-
 type RequestUrl struct {
 	Url   string `json:"url"`
 	Email string `json:"email"`
@@ -27,50 +22,6 @@ type RequestUrl struct {
 
 type ModuleArticleToEpub struct {
 	server *gin.Engine
-}
-
-func (m *ModuleArticleToEpub) convertArticle(c *gin.Context,
-	article []byte,
-	articleName string,
-	receiverEmail string,
-	a modules.ArticleSimplifierIntf,
-	h modules.HtmlToEpubConverterIntf,
-	e modules.EmailSenderIntf) {
-
-	html, title, author, err := a.SimplifyArticle(article)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	var epub []byte
-	epub, err = h.ConvertHtmlToEpub(html, title, author)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	attachmentName := articleName + `.epub`
-
-	if receiverEmail == "" {
-		c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, attachmentName))
-		c.Data(http.StatusOK, "application/epub+zip", epub)
-		return
-	}
-
-	e = emailsender.NewEmailSender("")
-	err = e.SendEmail([]string{receiverEmail},
-		fmt.Sprintf(topic, attachmentName),
-		body,
-		attachmentName,
-		epub,
-	)
-
-	if err == nil {
-		c.JSON(http.StatusOK, nil)
-	} else {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	}
 }
 
 func (m *ModuleArticleToEpub) fetchUrl(c *gin.Context) {
@@ -81,9 +32,25 @@ func (m *ModuleArticleToEpub) fetchUrl(c *gin.Context) {
 	}
 
 	articleName := misc.AdaptUrlToFileName(req.Url)
-	m.convertArticle(c, []byte(req.Url), articleName, req.Email,
+
+	controller := modules.ArticleToEpubController{}
+
+	res, err := controller.ConvertArticle([]byte(req.Url), articleName, req.Email,
 		&articlesimplifier.ArticleSimplifierFromURL{}, &htmltoepubconverter.HtmlToEpubConverter{},
 		emailsender.NewEmailSender(""))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else if res.SentByEmail {
+		if (res.Epub != nil) && (res.AttachmentName != "") {
+			c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, res.AttachmentName))
+			c.Data(http.StatusOK, "application/epub+zip", res.Epub)
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "No .epub file nor attachment name"})
+		}
+	} else {
+		c.JSON(http.StatusOK, nil)
+	}
 }
 
 func (m *ModuleArticleToEpub) convertHtml(c *gin.Context) {
@@ -119,9 +86,24 @@ func (m *ModuleArticleToEpub) convertHtml(c *gin.Context) {
 	}
 
 	articleName := misc.AdaptUrlToFileName(url)
-	m.convertArticle(c, html, articleName, receiverEmail,
-		&articlesimplifier.ArticleSimplifierFormHTML{}, &htmltoepubconverter.HtmlToEpubConverter{},
+	controller := modules.ArticleToEpubController{}
+
+	res, err := controller.ConvertArticle(html, articleName, receiverEmail,
+		&articlesimplifier.ArticleSimplifierFromURL{}, &htmltoepubconverter.HtmlToEpubConverter{},
 		emailsender.NewEmailSender(""))
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	} else if res.SentByEmail {
+		if (res.Epub != nil) && (res.AttachmentName != "") {
+			c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, res.AttachmentName))
+			c.Data(http.StatusOK, "application/epub+zip", res.Epub)
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "No .epub file nor attachment name"})
+		}
+	} else {
+		c.JSON(http.StatusOK, nil)
+	}
 }
 
 func (m *ModuleArticleToEpub) ExposeMethods() {

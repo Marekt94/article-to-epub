@@ -1,19 +1,51 @@
 package main
 
 import (
+	"article-to-epub/pkg/misc"
+	"article-to-epub/pkg/modules"
+	"article-to-epub/pkg/modules/articlesimplifier"
+	"article-to-epub/pkg/modules/emailsender"
+	"article-to-epub/pkg/modules/htmltoepubconverter"
 	"log"
+	"net/url"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/Marekt94/go-kernel-mt/logging"
 	"github.com/alecthomas/kong"
 	"github.com/joho/godotenv"
 )
 
+const (
+	InpUnknown int = iota
+	InpURL
+	InpHTML
+)
+
 type CLI struct {
-	Url        string `arg:"" name:"url" help:"Enter URL for artricle to convert"`
+	PathOrUrl  string `arg:"" name:"pathOrUrl" help:"Enter URL or HTML file path for artricle to convert"`
 	Email      string `help:"To: email" name:"email" short:"e"`
 	SaveToFile string `help:"Path to directory, where file will be saved" short:"f" type:"path"`
 	NoSend     bool   `help:"Do not send article via email" name:"no-send" default:"false" short:"n"`
+}
+
+func DetectInputType(pOu string) (int, error) {
+	if f, err := os.Stat(pOu); (err == nil) && !f.IsDir() {
+		ext := strings.ToLower(filepath.Ext(pOu))
+		if ext == `.html` || ext == `.htm` {
+			logging.Global.Infof("Input: HTML")
+			return InpHTML, nil
+		}
+	}
+
+	_, err := url.Parse(pOu)
+	if err == nil {
+		logging.Global.Infof("Input: URL")
+		return InpURL, nil
+	}
+
+	return InpUnknown, err
 }
 
 func Init() {
@@ -26,72 +58,38 @@ func Init() {
 }
 
 func main() {
-	// var artSimp modules.ArticleSimplifierIntf
-	// var htmlToEpubController modules.HtmlToEpubConverterIntf
-	// var emailSender modules.EmailSenderIntf
-
 	Init()
-
-	user := os.Getenv("SMTP_USER")
-	pass := os.Getenv("SMTP_PASS")
-	to := os.Getenv("SMTP_TO")
-	// from := user
 
 	var cli CLI
 	ctx := kong.Parse(&cli)
 	_ = ctx
-	logging.Global.Infof("url: %s, email: %s, path: %s, send: %v", cli.Url, cli.Email, cli.SaveToFile, !cli.NoSend)
+	logging.Global.Infof("url: %s, email: %s, path: %s, send: %v", cli.PathOrUrl, cli.Email, cli.SaveToFile, !cli.NoSend)
 
-	if pass == "" {
-		logging.Global.Warnf("WARNING: SMTP_PASS is empty")
-	}
+	articleName := misc.AdaptUrlToFileName(cli.PathOrUrl)
+	controller := modules.ArticleToEpubController{}
 
-	if user == "" {
-		logging.Global.Panicf("SMTP_USER is empty, skipping loop execution")
+	kind, err := DetectInputType(cli.PathOrUrl)
+	if err != nil {
+		logging.Global.Panicf("Invalid path or url: %v", cli.PathOrUrl)
 		return
 	}
 
-	if to == "" {
-		logging.Global.Panicf("Receiver e-mail address is empty")
-		return
+	var articleSimplifier modules.ArticleSimplifierIntf
+	htmlConverter := &htmltoepubconverter.HtmlToEpubConverter{}
+	emailSender := emailsender.NewEmailSender("")
+	switch kind {
+	case InpURL:
+		articleSimplifier = &articlesimplifier.ArticleSimplifierFromURL{}
+	case InpHTML:
+		articleSimplifier = &articlesimplifier.ArticleSimplifierFormHTML{}
 	}
 
-	// artSimp = &a.ArticleSimplifierFromURL{}
-	// htmlToEpubController = &h.HtmlToEpubConverter{}
-	// emailSender = emailsender.NewGmailEmailSender(user, pass)
+	res, err := controller.ConvertArticle([]byte(cli.PathOrUrl), articleName, cli.Email,
+		articleSimplifier, htmlConverter, emailSender)
 
-	// re := regexp.MustCompile(`[^\pL]+`)
-	// for {
-	// 	fmt.Println("Enter article address:")
-	// 	var url string
-	// 	fmt.Scanln(&url)
+	if err != nil {
+		logging.Global.Panicf("%v", err.Error())
+	}
+	logging.Global.Infof("Attachment name: %s, sent via e-mail: %v, epub: %v", res.AttachmentName, res.SentByEmail, res.Epub != nil)
 
-	// 	html, title, authors, err := artSimp.SimplifyArticle([]byte(url))
-	// 	if err != nil {
-	// 		logging.Global.Panicf("%v", err)
-	// 		continue
-	// 	}
-
-	// 	out, err := htmlToEpubController.ConvertHtmlToEpub(html, title, authors)
-	// 	if err != nil {
-	// 		logging.Global.Panicf("%v", err)
-	// 		continue
-	// 	}
-
-	// 	url = strings.ReplaceAll(title, `\`, "")
-	// 	url = re.ReplaceAllString(title, "_")
-	// 	filePath := url + `.epub`
-
-	// 	to := []string{to, from}
-	// 	content := "Article from article-to-epub converter"
-	// 	topic := "Article-to-epub converter: " + filePath
-	// 	attachmentName := filePath
-	// 	attachment := out
-	// 	err = emailSender.SendEmail(to, topic, content, attachmentName, attachment)
-	// 	if err != nil {
-	// 		logging.Global.Panicf("%v", err)
-	// 	} else {
-	// 		logging.Global.Infof("***Article sent successfully***")
-	// 	}
-	// }
 }
