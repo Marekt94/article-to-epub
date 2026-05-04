@@ -14,15 +14,21 @@ type ArticleToEpubKernel struct {
 }
 
 func (a *ArticleToEpubKernel) Init() {
-	logging.SetGlobalLogger(logging.NewZerologLogger())
-
-	logging.Global.Infof("Article-to-epub kernel initialization...")
-
-	a.server = gin.Default()
 	err := godotenv.Load()
 	if err != nil {
 		logging.Global.Panicf("error loading .env")
 	}
+	logging.SetGlobalLogger(logging.NewZerologLogger())
+
+	logging.Global.Infof("Article-to-epub kernel initialization...")
+
+	gin.DefaultWriter = logging.Global.Writer()
+	gin.DefaultErrorWriter = logging.Global.Writer()
+
+	a.server = gin.New()
+	a.server.Use(gin.Recovery())
+	a.server.Use(gin.Logger())
+
 	a.RegisterModule(&ModuleArticleToEpub{a.server})
 
 	logging.Global.Infof("Article-to-epub kernel initialization finished")

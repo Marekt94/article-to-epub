@@ -18,6 +18,22 @@ const cmdAuthors = "--authors"
 type HtmlToEpubConverter struct {
 }
 
+type LogWriter struct {
+}
+
+type ErrLogWriter struct {
+}
+
+func (l *ErrLogWriter) Write(p []byte) (n int, err error) {
+	logging.Global.Panicf(`[CONVERTER] %v`, string(p))
+	return len(p), nil
+}
+
+func (l *LogWriter) Write(p []byte) (n int, err error) {
+	logging.Global.Infof(`[CONVERTER] %v`, string(p))
+	return len(p), nil
+}
+
 func (c *HtmlToEpubConverter) HtmlToEpubConverterInternal(html []byte, outputDir string, outputFileName string, title string, authors string) ([]byte, error) {
 	if err := os.Mkdir(outputDir, 0755); err != nil && !os.IsExist(err) {
 		return nil, err
@@ -36,8 +52,8 @@ func (c *HtmlToEpubConverter) HtmlToEpubConverterInternal(html []byte, outputDir
 	cmd := exec.Command(converterExe, filePathInt, filepath.Join(outputDir, outputFileName), cmdTitle, title, cmdAuthors, authors)
 	logging.Global.Debugf(`cmd: %q`, cmd.Args)
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = &LogWriter{}
+	cmd.Stderr = &ErrLogWriter{}
 
 	if err := cmd.Run(); err != nil {
 		return nil, err
