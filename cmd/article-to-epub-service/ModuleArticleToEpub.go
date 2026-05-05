@@ -16,8 +16,8 @@ import (
 )
 
 type RequestUrl struct {
-	Url   string `json:"url"`
-	Email string `json:"email"`
+	Url   string   `json:"url"`
+	Email []string `json:"email"`
 }
 
 type ModuleArticleToEpub struct {
@@ -60,7 +60,7 @@ func (m *ModuleArticleToEpub) convertHtml(c *gin.Context) {
 		return
 	}
 
-	receiverEmail := c.PostForm(`email`)
+	receiverEmail := c.PostFormArray(`email`)
 	url := c.PostForm(`url`)
 	if url == "" {
 		url = "defaul name for article from article-to-epub software"

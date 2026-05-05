@@ -23,11 +23,15 @@ const (
 	InpHTML
 )
 
-type CLI struct {
-	PathOrUrl  string `arg:"" name:"pathOrUrl" help:"Enter URL or HTML file path for artricle to convert"`
-	Email      string `help:"To: email" name:"email" short:"e"`
-	SaveToFile string `help:"Path to directory, where file will be saved" short:"f" type:"path"`
-	NoSend     bool   `help:"Do not send article via email" name:"no-send" default:"false" short:"n"`
+var (
+	cli Cli
+)
+
+type Cli struct {
+	PathOrUrl  string   `arg:"" name:"pathOrUrl" help:"Enter URL or HTML file path for artricle to convert"`
+	Email      []string `help:"To: email" env:"SMTP_TO" name:"email" short:"e" sep:","`
+	SaveToFile string   `help:"Path to directory, where file will be saved" short:"f" type:"path"`
+	NoSend     bool     `help:"Do not send article via email" env:"NO_SEND" name:"no-send" short:"n"`
 }
 
 func DetectInputType(pOu string) (int, error) {
@@ -55,15 +59,14 @@ func Init() {
 	}
 
 	logging.SetGlobalLogger(logging.NewZerologLogger())
+
+	ctx := kong.Parse(&cli)
+	_ = ctx
+	logging.Global.Infof("url: %s, email: %s, path: %s, send: %v", cli.PathOrUrl, cli.Email, cli.SaveToFile, !cli.NoSend)
 }
 
 func main() {
 	Init()
-
-	var cli CLI
-	ctx := kong.Parse(&cli)
-	_ = ctx
-	logging.Global.Infof("url: %s, email: %s, path: %s, send: %v", cli.PathOrUrl, cli.Email, cli.SaveToFile, !cli.NoSend)
 
 	articleName := misc.AdaptUrlToFileName(cli.PathOrUrl)
 	controller := modules.ArticleToEpubController{}
@@ -75,8 +78,15 @@ func main() {
 	}
 
 	var articleSimplifier modules.ArticleSimplifierIntf
+	var emailSender modules.EmailSenderIntf
 	htmlConverter := &htmltoepubconverter.HtmlToEpubConverter{}
-	emailSender := emailsender.NewEmailSender("")
+
+	if len(cli.Email) == 0 || cli.NoSend {
+		emailSender = nil
+	} else {
+		emailSender = emailsender.NewEmailSender("")
+	}
+
 	switch kind {
 	case InpURL:
 		articleSimplifier = &articlesimplifier.ArticleSimplifierFromURL{}

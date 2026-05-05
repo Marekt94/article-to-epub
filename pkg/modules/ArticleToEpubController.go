@@ -21,7 +21,7 @@ type ConvertRes struct {
 func (m *ArticleToEpubController) ConvertArticle(
 	article []byte,
 	articleName string,
-	receiverEmail string,
+	receiverEmail []string,
 	a ArticleSimplifierIntf,
 	h HtmlToEpubConverterIntf,
 	e EmailSenderIntf) (*ConvertRes, error) {
@@ -39,11 +39,11 @@ func (m *ArticleToEpubController) ConvertArticle(
 
 	attachmentName := articleName + `.epub`
 
-	if receiverEmail == "" {
+	if len(receiverEmail) == 0 || e == nil {
 		return &ConvertRes{epub, attachmentName, false}, nil
 	}
 
-	err = e.SendEmail([]string{receiverEmail},
+	err = e.SendEmail(receiverEmail,
 		fmt.Sprintf(topic, attachmentName),
 		body,
 		attachmentName,
