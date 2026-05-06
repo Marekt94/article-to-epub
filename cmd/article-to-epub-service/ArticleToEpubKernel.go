@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	k "github.com/Marekt94/go-kernel-mt"
 	"github.com/Marekt94/go-kernel-mt/logging"
 	"github.com/gin-gonic/gin"
@@ -29,7 +31,7 @@ func (a *ArticleToEpubKernel) Init() {
 	a.server.Use(gin.Recovery())
 	a.server.Use(gin.Logger())
 
-	a.RegisterModule(&ModuleArticleToEpub{a.server})
+	a.RegisterModule(&ModuleArticleToEpub{a.server, os.Getenv("API_KEY")})
 
 	logging.Global.Infof("Article-to-epub kernel initialization finished")
 }

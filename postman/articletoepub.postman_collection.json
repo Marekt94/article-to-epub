@@ -1,11 +1,11 @@
 {
   "info": {
-    "_postman_id": "abfcfb19-e3ca-45ed-9114-e9a87bde244d",
+    "_postman_id": "f9fa7b02-7fc0-481c-811a-47e6fb6c6f71",
     "name": "articletoepub",
     "description": "Requests for article-to-epub service (Gin).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "30215534",
-    "_collection_link": "https://go.postman.co/collection/30215534-abfcfb19-e3ca-45ed-9114-e9a87bde244d?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/30215534-f9fa7b02-7fc0-481c-811a-47e6fb6c6f71?source=collection_link"
   },
   "item": [
     {
@@ -20,11 +20,15 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "API-Key {{apiKey}}"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"url\": \"https://fs.blog/mental-models/?utm_source=unknownews\",\r\n    \"email\": \"\"\r\n}",
+          "raw": "{\r\n    \"url\": \"https://fs.blog/mental-models/?utm_source=unknownews\",\r\n    \"email\": []\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -32,15 +36,16 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/fetch-url",
+          "raw": "{{baseUrl}}/api/fetch-url",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "api",
             "fetch-url"
           ]
         },
-        "description": "Calls /fetch-url with empty email to return an EPUB file as binary response.\n\nNote: the current server code registers this endpoint as GET but expects JSON body (ShouldBindJSON). Many proxies/clients don’t like GET with body; consider changing server to POST."
+        "description": "Calls /api/fetch-url with empty email array to return an EPUB file as binary response."
       },
       "response": []
     },
@@ -56,11 +61,15 @@
           {
             "key": "Content-Type",
             "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "API-Key {{apiKey}}"
           }
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n    \"url\": \"https://fs.blog/mental-models/?utm_source=unknownews\",\r\n    \"email\": \"marekt94@gmail.com\"\r\n}",
+          "raw": "{\r\n    \"url\": \"https://fs.blog/mental-models/?utm_source=unknownews\",\r\n    \"email\": [\"marekt94@gmail.com\"]\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -68,15 +77,16 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/fetch-url",
+          "raw": "{{baseUrl}}/api/fetch-url",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "api",
             "fetch-url"
           ]
         },
-        "description": "Calls /fetch-url with email to send EPUB as attachment. Response is JSON (or empty JSON) depending on implementation.\n\nNote: endpoint currently registered as GET but expects JSON body."
+        "description": "Calls /api/fetch-url with email array to send EPUB as attachment."
       },
       "response": []
     },
@@ -84,7 +94,12 @@
       "name": "Convert HTML (download)",
       "request": {
         "method": "POST",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "API-Key {{apiKey}}"
+          }
+        ],
         "body": {
           "mode": "formdata",
           "formdata": [
@@ -93,21 +108,71 @@
               "type": "file",
               "uuid": "d2fb92eb-a344-46af-85bb-c8807fdc469b",
               "src": "/C:/Repo/article-to-epub/pkg/modules/articlesimplifier/testdata/test.html"
+            },
+            {
+              "key": "email",
+              "value": "",
+              "type": "text"
+            },
+            {
+              "key": "url",
+              "value": "",
+              "type": "text"
             }
           ]
         },
         "url": {
-          "raw": "{{baseUrl}}/convert-html",
+          "raw": "{{baseUrl}}/api/convert-html",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
+            "api",
             "convert-html"
           ]
         },
         "description": "Endpoint exists in router, but handler is currently empty in ModuleArticleToEpub.convertHtml."
       },
       "response": []
+    }
+  ],
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "value",
+        "value": "API-Key api_key_test",
+        "type": "string"
+      },
+      {
+        "key": "key",
+        "value": "Authorization",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
     }
   ]
 }

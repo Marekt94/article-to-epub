@@ -10,6 +10,7 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
+	"strings"
 
 	"github.com/Marekt94/go-kernel-mt/logging"
 	"github.com/gin-gonic/gin"
@@ -22,6 +23,7 @@ type RequestUrl struct {
 
 type ModuleArticleToEpub struct {
 	server *gin.Engine
+	apiKey string
 }
 
 func (m *ModuleArticleToEpub) fetchUrl(c *gin.Context) {
@@ -41,7 +43,7 @@ func (m *ModuleArticleToEpub) fetchUrl(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-	} else if res.SentByEmail {
+	} else if !res.SentByEmail {
 		if (res.Epub != nil) && (res.AttachmentName != "") {
 			c.Header("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, res.AttachmentName))
 			c.Data(http.StatusOK, "application/epub+zip", res.Epub)
@@ -106,9 +108,31 @@ func (m *ModuleArticleToEpub) convertHtml(c *gin.Context) {
 	}
 }
 
+func (m *ModuleArticleToEpub) Authorize(c *gin.Context) {
+	h := c.GetHeader("Authorization")
+
+	if !strings.HasPrefix(h, "API-Key") {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	apiKey := strings.TrimSpace(strings.TrimPrefix(h, "API-Key"))
+
+	if apiKey == "" || apiKey != m.apiKey {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	c.Next()
+}
+
 func (m *ModuleArticleToEpub) ExposeMethods() {
-	m.server.POST("/convert-html", m.convertHtml)
-	m.server.POST("/fetch-url", m.fetchUrl)
+	api := m.server.Group("/api")
+	api.Use(m.Authorize)
+	api.POST("/convert-html", m.convertHtml)
+	api.POST("/fetch-url", m.fetchUrl)
+
+	m.server.GET("/health", func(c *gin.Context) { c.JSON(http.StatusOK, nil) })
 }
 
 func (m *ModuleArticleToEpub) RegisterPermissions() {

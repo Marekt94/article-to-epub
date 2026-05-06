@@ -2,17 +2,25 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug article-to-epub",
+      "name": "Debug article-to-epub-cli",
       "type": "go",
       "request": "launch",
       "mode": "auto",
-      "program": "${workspaceFolder}/cmd/article-to-epub",
-      "cwd": "${workspaceFolder}",
+      "program": "${workspaceFolder}/cmd/article-to-epub-cli",
+      "cwd": "${workspaceFolder}/cmd/article-to-epub-cli",
       "console": "integratedTerminal",
-      "env": {
-        "ARTICLE_SIMPLIFIER_TIMEOUT": "30",
-        "EBOOK_CONVERTER_PATH": "C:/Program Files/Calibre2/ebook-converter.exe"
-      },
+      "env": {},
+      "args": ["https://fs.blog/mental-models/?utm_source=unknownews"],
+      "showLog": false
+    },
+    {
+      "name": "Debug article-to-epub-service",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/article-to-epub-service",
+      "cwd": "${workspaceFolder}/cmd/article-to-epub-service",
+      "console": "integratedTerminal",
       "args": [],
       "showLog": false
     }
