@@ -20,7 +20,7 @@ func (a *ArticleToEpubKernel) Init() {
 	if err != nil {
 		logging.Global.Panicf("error loading .env")
 	}
-	logging.SetGlobalLogger(logging.NewZerologLogger())
+	logging.SetGlobalLogger(logging.NewZerologLoggerWithGinWritter())
 
 	logging.Global.Infof("Article-to-epub kernel initialization...")
 

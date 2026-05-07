@@ -3,7 +3,8 @@ module article-to-epub
 go 1.25.0
 
 require (
-	github.com/Marekt94/go-kernel-mt v0.2.0
+	github.com/Marekt94/go-kernel-mt v0.3.0
+	github.com/alecthomas/kong v1.15.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/go-shiori/go-readability v0.0.0-20251205110129-5db1dc9836f0
 	github.com/joho/godotenv v1.5.1
@@ -11,7 +12,6 @@ require (
 )
 
 require (
-	github.com/alecthomas/kong v1.15.0 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
