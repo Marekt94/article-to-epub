@@ -16,9 +16,9 @@ type ArticleToEpubKernel struct {
 }
 
 func (a *ArticleToEpubKernel) Init() {
-	err := godotenv.Load()
-	if err != nil {
-		logging.Global.Panicf("error loading .env")
+	// Load optional .env (local/dev convenience). Missing file shouldn't crash prod.
+	if err := godotenv.Load(); err != nil {
+		// Logger isn't set up yet, so keep it silent here.
 	}
 	logging.SetGlobalLogger(logging.NewZerologLoggerWithGinWritter())
 
@@ -39,5 +39,11 @@ func (a *ArticleToEpubKernel) Init() {
 func (a *ArticleToEpubKernel) Run() {
 	a.Kernel.Run()
 
-	a.server.Run()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	if err := a.server.Run(":" + port); err != nil {
+		logging.Global.Panicf("gin server failed to start: %v", err)
+	}
 }
