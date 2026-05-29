@@ -1,4 +1,4 @@
-package htmltoepubconverter
+package calibreconverter
 
 import (
 	"testing"
