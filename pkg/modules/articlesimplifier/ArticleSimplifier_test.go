@@ -20,8 +20,11 @@ func TestArticleSimplifierForHTML(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	_, _, _, err = simplifier.SimplifyArticle(strm)
+	var content []byte = nil
+	content, _, _, err = simplifier.SimplifyArticle(strm)
 	if err != nil {
 		t.Error(err.Error())
+	} else {
+		os.WriteFile("testdata\\test_output.html", content, 0644)
 	}
 }

@@ -29,7 +29,7 @@ func (l *ErrLogWriter) Write(p []byte) (n int, err error) {
 	if len(message) > 0 && message[len(message)-1] == '\n' {
 		message = message[:len(message)-1]
 	}
-	logging.Global.Panicf(`[CONVERTER] %v`, message)
+	logging.Global.Errorf(`[CONVERTER] %v`, message)
 	return len(p), nil
 }
 

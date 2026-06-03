@@ -3,7 +3,6 @@ package articlesimplifier
 import (
 	"bytes"
 	"net/url"
-	"os"
 
 	log "github.com/Marekt94/go-kernel-mt/logging"
 	"github.com/go-shiori/go-readability"
@@ -13,13 +12,8 @@ type ArticleSimplifierFormHTML struct {
 }
 
 func (a *ArticleSimplifierFormHTML) SimplifyArticle(article []byte) (simpArticle []byte, title string, author string, err error) {
-	path := string(article)
-	b, err := os.ReadFile(path)
-	if err != nil {
-		return nil, "", "", err
-	}
-
-	strm := bytes.NewReader(b)
+	//DONE: - to wywalić, bo to powinno być w main dla CLI (testy nie przechodza)
+	strm := bytes.NewReader(article)
 	articleInt, err := readability.FromReader(strm, &url.URL{})
 	if err != nil {
 		return nil, "", "", err

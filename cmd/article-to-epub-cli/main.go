@@ -91,7 +91,9 @@ func main() {
 	case InpURL:
 		articleSimplifier = &articlesimplifier.ArticleSimplifierFromURL{}
 	case InpHTML:
-		articleSimplifier = &articlesimplifier.ArticleSimplifierFormHTML{}
+		articleSimplifier = &articlesimplifier.ArticleSimplifierFromFileWrapper{
+			ArticleSimplifier: &articlesimplifier.ArticleSimplifierFormHTML{},
+		}
 	}
 
 	res, err := controller.ConvertArticle([]byte(cli.PathOrUrl), articleName, cli.Email,

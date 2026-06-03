@@ -5,7 +5,7 @@ import (
 )
 
 func TestHtmlToEpubConverter(t *testing.T) {
-	const tempDir = ".\\temp"
+	const tempDir = "..\\temp"
 	const tempFileName = "temp.epub"
 	converter := &HtmlToEpubConverter{}
 	out, err := converter.HtmlToEpubConverterInternal([]byte("<html><body><h1>Test</h1></body></html>"), ".\\temp", "temp.epub", "", "")
