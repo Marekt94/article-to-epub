@@ -5,7 +5,7 @@ import (
 	"article-to-epub/pkg/modules"
 	"article-to-epub/pkg/modules/articlesimplifier"
 	"article-to-epub/pkg/modules/emailsender"
-	"article-to-epub/pkg/modules/htmltoepubconverters/calibreconverter"
+	"article-to-epub/pkg/modules/htmltoepubconverters/gonejackconverter"
 	"log"
 	"net/url"
 	"os"
@@ -79,7 +79,7 @@ func main() {
 
 	var articleSimplifier modules.ArticleSimplifierIntf
 	var emailSender modules.EmailSenderIntf
-	htmlConverter := &calibreconverter.HtmlToEpubConverter{}
+	htmlConverter := &gonejackconverter.HtmlToEpubConverter{}
 
 	if len(cli.Email) == 0 || cli.NoSend {
 		emailSender = nil
