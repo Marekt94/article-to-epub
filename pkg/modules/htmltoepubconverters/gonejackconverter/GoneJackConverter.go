@@ -9,7 +9,7 @@ import (
 	"github.com/gonejack/html-to-epub/html2epub"
 )
 
-//go:embed res/cover.png
+//go:embed res/cover.jpg
 var defaultCover []byte
 
 const logConverter = `[CONVERTER] %q`

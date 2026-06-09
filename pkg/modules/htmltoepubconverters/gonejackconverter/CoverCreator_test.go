@@ -18,12 +18,12 @@ func TestGenerateCover(t *testing.T) {
 	}
 	baseDir := filepath.Dir(thisFile)
 
-	b, err := os.ReadFile(filepath.Join(baseDir, ".\\res\\cover.png"))
+	b, err := os.ReadFile(filepath.Join(baseDir, ".\\res\\cover.jpg"))
 	if err != nil {
 		t.Error(err)
 	}
 
-	res, err := coverCreateor.CreateCover(b, "Test Title example", "Name Surname-Surname")
+	res, err := coverCreateor.CreateCover(b, "Lorem ipsum dolor sit amet, consectetur", "Lorem ipsum dolor sit amet, consectetur")
 
 	if err != nil {
 		t.Error(err)
@@ -32,6 +32,6 @@ func TestGenerateCover(t *testing.T) {
 	if res == nil {
 		t.Error("res is nil")
 	} else {
-		os.WriteFile(filepath.Join(baseDir, "cover-test.png"), res, 0644)
+		os.WriteFile(filepath.Join(baseDir, "cover-test.jpg"), res, 0644)
 	}
 }

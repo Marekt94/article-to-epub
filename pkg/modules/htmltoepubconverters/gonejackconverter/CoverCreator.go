@@ -27,17 +27,19 @@ func (c *CoverCreator) CreateCover(canvas []byte, title string, author string) (
 	}
 	baseDir := filepath.Dir(thisFile)
 
-	err = ctx.LoadFontFace(filepath.Join(baseDir, "res\\arial.ttf"), 120)
+	fontHeight := float64(ctx.Height()) / 15.0
+	err = ctx.LoadFontFace(filepath.Join(baseDir, "res\\CrimsonPro-VariableFont_wght.ttf"), fontHeight)
 	if err != nil {
 		return nil, err
 	}
 
 	ax := float64(ctx.Width() / 2)
-	margin := 250.0
+	marginY := float64(ctx.Height()) / 8.0
+	marginX := 40.0
 
 	ctx.SetHexColor("#000000")
-	ctx.DrawStringAnchored(title, ax, margin, 0.5, 0.5)
-	ctx.DrawStringAnchored(author, ax, float64(ctx.Height())-margin, 0.5, 0.5)
+	ctx.DrawStringWrapped(title, ax, marginY, 0.5, 0.5, float64(ctx.Width())-2*marginX, 1.5, gg.AlignCenter)
+	ctx.DrawStringWrapped(author, ax, float64(ctx.Height())-marginY, 0.5, 0.5, float64(ctx.Width())-2*marginX, 1.5, gg.AlignCenter)
 
 	var res bytes.Buffer
 	imgRes := ctx.Image()
