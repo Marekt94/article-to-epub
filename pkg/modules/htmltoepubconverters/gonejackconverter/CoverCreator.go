@@ -27,7 +27,7 @@ func (c *CoverCreator) CreateCover(canvas []byte, title string, author string) (
 	}
 	baseDir := filepath.Dir(thisFile)
 
-	fontHeight := float64(ctx.Height()) / 15.0
+	fontHeight := float64(ctx.Height()) / 20.0
 	err = ctx.LoadFontFace(filepath.Join(baseDir, "res\\CrimsonPro-VariableFont_wght.ttf"), fontHeight)
 	if err != nil {
 		return nil, err

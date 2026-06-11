@@ -79,7 +79,8 @@ func main() {
 
 	var articleSimplifier modules.ArticleSimplifierIntf
 	var emailSender modules.EmailSenderIntf
-	htmlConverter := &gonejackconverter.HtmlToEpubConverter{}
+	var htmlConverter modules.HtmlToEpubConverterIntf
+	htmlConverter = gonejackconverter.NewGoneJackConverter()
 
 	if len(cli.Email) == 0 || cli.NoSend {
 		emailSender = nil

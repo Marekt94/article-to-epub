@@ -40,7 +40,7 @@ func (m *ModuleArticleToEpub) fetchUrl(c *gin.Context) {
 
 	res, err := controller.ConvertArticle([]byte(req.Url), articleName, req.Email,
 		&articlesimplifier.ArticleSimplifierFromURL{},
-		&gonejackconverter.HtmlToEpubConverter{},
+		gonejackconverter.NewGoneJackConverter(),
 		emailsender.NewEmailSender(""))
 
 	if err != nil {

@@ -7,25 +7,21 @@ import (
 )
 
 func TestHtmlToEpubConverter(t *testing.T) {
-	const tempDir = "..\\testdata"
 	const tempFileName = "..\\testdata\\test.html"
-	const outp = "..\\testdata\\temp.epub"
 
 	b, err := os.ReadFile(tempFileName)
 	if err != nil {
 		t.Errorf(`No test file: %q`, err)
 	}
 
-	converter := &HtmlToEpubConverter{}
-	out, err := converter.ConvertHtmlToEpub(b, outp, "Test Author")
+	converter := NewGoneJackConverter()
+	out, err := converter.ConvertHtmlToEpub(b, "Test title", "Test Author")
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
 
 	if out == nil {
 		t.Errorf("No file stream!")
-	} else {
-		os.Remove(outp)
 	}
 }
 

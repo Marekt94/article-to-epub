@@ -1,6 +1,7 @@
 package gonejackconverter
 
 import (
+	"article-to-epub/pkg/modules"
 	"os"
 
 	_ "embed"
@@ -14,7 +15,12 @@ var defaultCover []byte
 
 const logConverter = `[CONVERTER] %q`
 
+func NewGoneJackConverter() *HtmlToEpubConverter {
+	return &HtmlToEpubConverter{Covercreator: &CoverCreator{}}
+}
+
 type HtmlToEpubConverter struct {
+	Covercreator modules.CoverCreatorIntf
 }
 
 func CreateRandomOutputFileName(ext string) (string, error) {
@@ -56,6 +62,12 @@ func (c *HtmlToEpubConverter) ConvertHtmlToEpub(htmlContent []byte, title string
 	if err != nil {
 		return nil, err
 	}
+
+	cover, err := c.Covercreator.CreateCover(defaultCover, title, authors)
+	if err != nil {
+		return nil, err
+	}
+
 	opt := html2epub.Options{
 		Output:  output,
 		HTML:    []string{tempFileName},
@@ -63,7 +75,7 @@ func (c *HtmlToEpubConverter) ConvertHtmlToEpub(htmlContent []byte, title string
 	}
 	cmd := html2epub.Cmd{
 		Options:      opt,
-		DefaultCover: defaultCover,
+		DefaultCover: cover,
 	}
 	err = cmd.Run()
 	var out []byte = nil
