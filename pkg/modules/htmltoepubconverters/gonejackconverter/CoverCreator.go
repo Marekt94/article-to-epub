@@ -5,8 +5,8 @@ import (
 	"errors"
 	"image"
 	"image/png"
+	"os"
 	"path/filepath"
-	"runtime"
 
 	"github.com/fogleman/gg"
 )
@@ -21,9 +21,13 @@ func (c *CoverCreator) CreateCover(canvas []byte, title string, author string) (
 	}
 	ctx := gg.NewContextForImage(img)
 
-	_, thisFile, _, ok := runtime.Caller(0)
-	if !ok {
-		return nil, errors.New("runtime.Caller init error")
+	// _, thisFile, _, ok := runtime.Caller(0)
+	// if !ok {
+	// 	return nil, errors.New("runtime.Caller init error")
+	// }
+	thisFile, err := os.Executable()
+	if err != nil {
+		return nil, errors.New("cannot determine executable path: " + err.Error())
 	}
 	baseDir := filepath.Dir(thisFile)
 
