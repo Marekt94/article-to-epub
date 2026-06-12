@@ -3,7 +3,6 @@ package main
 import (
 	"article-to-epub/pkg/misc"
 	"os"
-	"path/filepath"
 	"strings"
 
 	k "github.com/Marekt94/go-kernel-mt"
@@ -48,7 +47,7 @@ func (a *ArticleToEpubKernel) Init() {
 	if err != nil {
 		logging.Global.Panicf("Application directory: %s", err.Error())
 	} else {
-		logging.Global.Infof("Application directory: %s", filepath.Dir(appDir))
+		logging.Global.Infof("Application directory: %s", appDir)
 	}
 
 	a.RegisterModule(&ModuleArticleToEpub{a.server, os.Getenv("API_KEY")})
