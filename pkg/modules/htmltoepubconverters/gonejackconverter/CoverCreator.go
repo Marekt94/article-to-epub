@@ -1,11 +1,10 @@
 package gonejackconverter
 
 import (
+	"article-to-epub/pkg/misc"
 	"bytes"
-	"errors"
 	"image"
 	"image/png"
-	"os"
 	"path/filepath"
 
 	"github.com/fogleman/gg"
@@ -21,15 +20,10 @@ func (c *CoverCreator) CreateCover(canvas []byte, title string, author string) (
 	}
 	ctx := gg.NewContextForImage(img)
 
-	// _, thisFile, _, ok := runtime.Caller(0)
-	// if !ok {
-	// 	return nil, errors.New("runtime.Caller init error")
-	// }
-	thisFile, err := os.Executable()
+	baseDir, err := misc.GetAppDir()
 	if err != nil {
-		return nil, errors.New("cannot determine executable path: " + err.Error())
+		return nil, err
 	}
-	baseDir := filepath.Dir(thisFile)
 
 	fontHeight := float64(ctx.Height()) / 20.0
 	err = ctx.LoadFontFace(filepath.Join(baseDir, "res\\CrimsonPro-VariableFont_wght.ttf"), fontHeight)
