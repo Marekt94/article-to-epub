@@ -1,8 +1,10 @@
 package gonejackconverter
 
 import (
+	"article-to-epub/pkg/misc"
 	"article-to-epub/pkg/modules"
 	"os"
+	"path/filepath"
 
 	_ "embed"
 
@@ -13,7 +15,8 @@ import (
 //go:embed res/cover.jpg
 var defaultCover []byte
 
-const logConverter = `[CONVERTER] %q`
+const LOG_CONVERTER = `[CONVERTER] %q`
+const TEMP_PATTERN = `art-*`
 
 func NewGoneJackConverter() *HtmlToEpubConverter {
 	return &HtmlToEpubConverter{Covercreator: &CoverCreator{}}
@@ -23,7 +26,7 @@ type HtmlToEpubConverter struct {
 	Covercreator modules.CoverCreatorIntf
 }
 
-func CreateRandomOutputFileName(ext string) (string, error) {
+func CreateRandomOutputFileName(dir string, ext string) (string, error) {
 	pattern := `temp-*.`
 	if ext != "" {
 		if ext[0] == '.' {
@@ -32,7 +35,7 @@ func CreateRandomOutputFileName(ext string) (string, error) {
 			pattern += ext
 		}
 	}
-	f, err := os.CreateTemp("", pattern)
+	f, err := os.CreateTemp(dir, pattern)
 	if err != nil {
 		return "", err
 	} else {
@@ -44,13 +47,25 @@ func CreateRandomOutputFileName(ext string) (string, error) {
 }
 
 func (c *HtmlToEpubConverter) ConvertHtmlToEpub(htmlContent []byte, title string, authors string) ([]byte, error) {
-	f, err := os.CreateTemp("", "art-*.html")
+	appDir, err := misc.GetAppDir()
 	if err != nil {
 		return nil, err
 	}
-	tempFileName := f.Name()
-	logging.Global.Debugf(logConverter, `tempFileName = `+tempFileName)
-	defer os.Remove(tempFileName)
+	tempDir, err := os.MkdirTemp(appDir, TEMP_PATTERN)
+	if err != nil {
+		return nil, err
+	}
+	defer os.RemoveAll(tempDir)
+	logging.Global.Debugf(LOG_CONVERTER, `tempDir = `+tempDir)
+
+	tempFilePrefix := filepath.Join(tempDir, filepath.Base(tempDir))
+	htmlFileName := tempFilePrefix + ".html"
+	f, err := os.Create(htmlFileName)
+	if err != nil {
+		return nil, err
+	}
+	logging.Global.Debugf(LOG_CONVERTER, `tempFileName = `+htmlFileName)
+	defer os.Remove(htmlFileName)
 
 	_, err = f.Write(htmlContent)
 	f.Close()
@@ -58,7 +73,8 @@ func (c *HtmlToEpubConverter) ConvertHtmlToEpub(htmlContent []byte, title string
 		return nil, err
 	}
 
-	output, err := CreateRandomOutputFileName(`.epub`)
+	output := tempFilePrefix + ".epub"
+	logging.Global.Debugf(LOG_CONVERTER, `outputFileName = `+output)
 	if err != nil {
 		return nil, err
 	}
@@ -69,9 +85,10 @@ func (c *HtmlToEpubConverter) ConvertHtmlToEpub(htmlContent []byte, title string
 	}
 
 	opt := html2epub.Options{
-		Output:  output,
-		HTML:    []string{tempFileName},
-		Verbose: true,
+		Output:    output,
+		HTML:      []string{htmlFileName},
+		Verbose:   true,
+		ImagesDir: tempDir,
 	}
 	cmd := html2epub.Cmd{
 		Options:      opt,

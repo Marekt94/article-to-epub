@@ -27,7 +27,7 @@ func TestHtmlToEpubConverter(t *testing.T) {
 
 func TestCreateRandomOutputFileName(t *testing.T) {
 	defExt := `.epub`
-	out, err := CreateRandomOutputFileName(`.epub`)
+	out, err := CreateRandomOutputFileName("", `.epub`)
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -39,7 +39,7 @@ func TestCreateRandomOutputFileName(t *testing.T) {
 		t.Errorf(`Temp file exists but it should not`)
 	}
 
-	out, err = CreateRandomOutputFileName(`epub`)
+	out, err = CreateRandomOutputFileName("", `epub`)
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
