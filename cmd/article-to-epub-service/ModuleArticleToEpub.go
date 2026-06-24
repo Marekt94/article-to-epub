@@ -41,11 +41,14 @@ func (m *ModuleArticleToEpub) fetchUrl(c *gin.Context) {
 		return
 	}
 
-	articleName := misc.AdaptUrlToFileName(req.Url)
+	articleFileName, err := misc.AdaptUrlToFileName(req.Url)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, m.errWrapper(err))
+	}
 
 	controller := modules.ArticleToEpubController{}
 
-	res, err := controller.ConvertArticle([]byte(req.Url), articleName, req.Email,
+	res, err := controller.ConvertArticle([]byte(req.Url), articleFileName, req.Email,
 		&articlesimplifier.ArticleSimplifierFromURL{},
 		gonejackconverter.NewGoneJackConverter(),
 		emailsender.NewEmailSender(""))
@@ -96,7 +99,10 @@ func (m *ModuleArticleToEpub) convertHtml(c *gin.Context) {
 		return
 	}
 
-	articleName := misc.AdaptUrlToFileName(url)
+	articleName, err := misc.AdaptUrlToFileName(url)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, m.errWrapper(err))
+	}
 	controller := modules.ArticleToEpubController{}
 
 	res, err := controller.ConvertArticle(html, articleName, receiverEmail,

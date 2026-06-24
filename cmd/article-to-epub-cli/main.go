@@ -68,7 +68,10 @@ func Init() {
 func main() {
 	Init()
 
-	articleName := misc.AdaptUrlToFileName(cli.PathOrUrl)
+	articleName, err := misc.AdaptUrlToFileName(cli.PathOrUrl)
+	if err != nil {
+		logging.Global.Panicf("Invalid path or url: %v", cli.PathOrUrl)
+	}
 	controller := modules.ArticleToEpubController{}
 
 	kind, err := DetectInputType(cli.PathOrUrl)

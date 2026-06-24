@@ -2,16 +2,32 @@ package misc
 
 import (
 	"errors"
+	urlLib "net/url"
 	"os"
+	"path"
 	"path/filepath"
-	"regexp"
 	"strings"
 )
 
-func AdaptUrlToFileName(url string) string {
-	re := regexp.MustCompile(`[^\pL]+`)
-	url = strings.ReplaceAll(url, `\`, "")
-	return re.ReplaceAllString(url, "_")
+const DEFAULT_FILE_NAME = "Default_file_name"
+const MAX_FILE_NAME_LENGTH = 32
+
+func AdaptUrlToFileName(url string) (string, error) {
+	if len(strings.TrimSpace(url)) == 0 {
+		return DEFAULT_FILE_NAME, nil
+	}
+	u, err := urlLib.Parse(url)
+	if err != nil {
+		return DEFAULT_FILE_NAME, err
+	}
+
+	res := path.Base(u.Path)
+
+	if len(res) > 32 {
+		return res[:MAX_FILE_NAME_LENGTH], nil
+	} else {
+		return res, nil
+	}
 }
 
 func GetAppDir() (string, error) {
