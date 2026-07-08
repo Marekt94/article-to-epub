@@ -5,7 +5,6 @@ import (
 	"article-to-epub/pkg/modules"
 	"article-to-epub/pkg/modules/articlesimplifier"
 	"article-to-epub/pkg/modules/emailsender"
-	"article-to-epub/pkg/modules/htmltoepubconverters/calibreconverter"
 	"article-to-epub/pkg/modules/htmltoepubconverters/gonejackconverter"
 	"errors"
 	"fmt"
@@ -106,8 +105,8 @@ func (m *ModuleArticleToEpub) convertHtml(c *gin.Context) {
 	controller := modules.ArticleToEpubController{}
 
 	res, err := controller.ConvertArticle(html, articleName, receiverEmail,
-		&articlesimplifier.ArticleSimplifierFromURL{},
-		&calibreconverter.HtmlToEpubConverter{},
+		&articlesimplifier.ArticleSimplifierFormHTML{},
+		gonejackconverter.NewGoneJackConverter(),
 		emailsender.NewEmailSender(""))
 
 	if err != nil {
