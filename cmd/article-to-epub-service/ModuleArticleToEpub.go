@@ -73,7 +73,15 @@ func (m *ModuleArticleToEpub) convertHtml(c *gin.Context) {
 		return
 	}
 
-	receiverEmail := c.PostFormArray(`email`)
+	rawReceiverEmail := c.PostForm(`email`)
+	var receiverEmail []string
+	if strings.TrimSpace(rawReceiverEmail) != "" {
+		receiverEmail = strings.Split(rawReceiverEmail, `,`)
+	}
+	for i := range receiverEmail {
+		receiverEmail[i] = strings.TrimSpace(receiverEmail[i])
+	}
+
 	url := c.PostForm(`url`)
 	if url == "" {
 		url = "defaul name for article from article-to-epub software"
