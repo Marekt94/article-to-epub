@@ -83,11 +83,11 @@ func (es EmailSender) sendEmailsParallel(to []string, topic string, content stri
 	var wg sync.WaitGroup
 	for _, receiver := range to {
 		wg.Add(1)
-		go func() {
+		go func(r string) {
 			defer wg.Done()
-			err := es.sendEmail([]string{receiver}, topic, content, attachmentName, attachment)
-			sendResult <- EmailSendResult{receiver: receiver, err: err}
-		}()
+			err := es.sendEmail([]string{r}, topic, content, attachmentName, attachment)
+			sendResult <- EmailSendResult{receiver: r, err: err}
+		}(receiver)
 	}
 	go func() {
 		wg.Wait()
