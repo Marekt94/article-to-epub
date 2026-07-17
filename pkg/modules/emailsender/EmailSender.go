@@ -3,7 +3,10 @@ package emailsender
 import (
 	"article-to-epub/pkg/modules"
 	"crypto/tls"
+	"errors"
+	"fmt"
 	"os"
+	"sync"
 
 	"io"
 
@@ -17,6 +20,11 @@ type EmailSender struct {
 
 	smtpUser string
 	smtpPass string
+}
+
+type EmailSendResult struct {
+	receiver string
+	err      error
 }
 
 func NewEmailSender(ident string) modules.EmailSenderIntf {
@@ -43,6 +51,10 @@ func NewGmailEmailSender(user string, password string) *EmailSender {
 }
 
 func (es EmailSender) SendEmail(to []string, topic string, content string, attachmentName string, attachment []byte) error {
+	return es.sendEmailsParallel(to, topic, content, attachmentName, attachment)
+}
+
+func (es EmailSender) sendEmail(to []string, topic string, content string, attachmentName string, attachment []byte) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", es.smtpUser)
 	m.SetHeader("To", to...)
@@ -62,6 +74,34 @@ func (es EmailSender) SendEmail(to []string, topic string, content string, attac
 	err := d.DialAndSend(m)
 	if err == nil {
 		logging.Global.Infof("Email sent successfully!")
+	}
+	return err
+}
+
+func (es EmailSender) sendEmailsParallel(to []string, topic string, content string, attachmentName string, attachment []byte) error {
+	sendResult := make(chan EmailSendResult, len(to))
+	var wg sync.WaitGroup
+	for _, receiver := range to {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			err := es.sendEmail([]string{receiver}, topic, content, attachmentName, attachment)
+			sendResult <- EmailSendResult{receiver: receiver, err: err}
+		}()
+	}
+	go func() {
+		wg.Wait()
+		close(sendResult)
+	}()
+	var err error = nil
+	for r := range sendResult {
+		if r.err != nil {
+			errText := fmt.Sprintf("Email to receiver %s sent with error %v", r.receiver, r.err)
+			logging.Global.Errorf(errText)
+			err = errors.Join(err, errors.New(errText))
+		} else {
+			logging.Global.Infof("Email to receiver %s sent successfully!", r.receiver)
+		}
 	}
 	return err
 }
