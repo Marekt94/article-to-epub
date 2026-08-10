@@ -1,14 +1,18 @@
 package gonejackconverter
 
 import (
-	"article-to-epub/pkg/misc"
 	"bytes"
+	_ "embed"
 	"image"
 	"image/png"
-	"path/filepath"
 
 	"github.com/fogleman/gg"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/opentype"
 )
+
+//go:embed res/CrimsonPro-VariableFont_wght.ttf
+var fontFile []byte
 
 type CoverCreator struct {
 }
@@ -20,16 +24,20 @@ func (c *CoverCreator) CreateCover(canvas []byte, title string, author string) (
 	}
 	ctx := gg.NewContextForImage(img)
 
-	baseDir, err := misc.GetAppDir()
+	fontHeight := float64(ctx.Height()) / 20.0
+
+	f, err := opentype.Parse(fontFile)
 	if err != nil {
 		return nil, err
 	}
 
-	fontHeight := float64(ctx.Height()) / 20.0
-	err = ctx.LoadFontFace(filepath.Join(baseDir, "res\\CrimsonPro-VariableFont_wght.ttf"), fontHeight)
-	if err != nil {
-		return nil, err
-	}
+	face, err := opentype.NewFace(f, &opentype.FaceOptions{
+		Size:    fontHeight,
+		DPI:     72,
+		Hinting: font.HintingNone,
+	})
+
+	ctx.SetFontFace(face)
 
 	ax := float64(ctx.Width() / 2)
 	marginY := float64(ctx.Height()) / 8.0
